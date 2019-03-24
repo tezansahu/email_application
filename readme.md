@@ -11,16 +11,16 @@ An application that implements a simplified version of PoP3 email protocol betwe
 3. To start the server, type:
 
 ```console
-g++ -std=c++0x -c SimpleEmailServer.cpp
-g++ -std=c++0x -o server SimpleEmailServer.o
-./server <port-number> <password-file-name>
+$ g++ -std=c++0x -c SimpleEmailServer.cpp
+$ g++ -std=c++0x -o server SimpleEmailServer.o
+$ ./server <port-number> <password-file-name> <user-database-path>
 ```
 
 4. Open another terminal (or another computer) and start the client by typing:
 
 ```console
-g++ -std=c++0x -c SimpleEmailClient.cpp
-g++ -std=c++0x -o client SimpleClientServer.o
-./client <server-IP-Adderss>:<port-number> <username> <password>
+$ g++ -std=c++0x -c SimpleEmailClient.cpp
+$ g++ -std=c++0x -o client SimpleClientServer.o
+$ ./client <server-IP-Adderss>:<port-number> <username> <password>
 ```
 
