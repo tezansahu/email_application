@@ -77,7 +77,14 @@ int main(int argc, char *args[]){
         exit(1);
     }
     
-    //After a brief pause, send a 'quit' request
+   
+    string list = string("LIST\0");
+    send(client_socket,list.c_str(), strlen(list.c_str()),0);
+    char response3[4096] = "\0";
+    recv(client_socket, response3, sizeof(response3),0);
+    printf("%s\n",response3);
+
+     //After a brief pause, send a 'quit' request
     sleep(1);
     string quit = string("quit\0");
     send(client_socket,quit.c_str(), strlen(quit.c_str()),0);

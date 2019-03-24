@@ -30,13 +30,21 @@ return &(((struct sockaddr_in6*)sa)->sin6_addr);
 
 int main(int argc, char *args[]){
     // Check the correct number of arguements
-    if(argc != 3){
+    if(argc != 4){
         cerr<<"Incorrect number of arguments passed!\n";
         return 1;
     }
 
     const char* portNum = args[1];
     const char* passwdfile = args[2];
+    const char* file_path = args[3];
+
+    string check_file_path = string("test -d ")+string(file_path);
+    if(system(check_file_path.c_str()) !=0 ){
+        cerr<<"Unable to access the user-database\n";
+        exit(4);
+    }
+    
 
     // Open the password file and try to read the data and store it in a mapping
     ifstream file;
@@ -158,28 +166,61 @@ int main(int argc, char *args[]){
         cout<<welcome_msg;
         send(client_socket, welcome_msg.c_str(), strlen(welcome_msg.c_str()), 0);
 
-        // Get the next message from the client
-        char response2[4096] = "\0";
-        recv(client_socket, response2, sizeof(response2),0);
 
-        // If the client sends 'quit' message, logout and close connections
-        if(strcmp(response2, "quit") == 0){
-            string logout_msg = string("Bye ")+string(input_userName)+string("\n");
-            cout<<logout_msg;
-            send(client_socket, logout_msg.c_str(), strlen(logout_msg.c_str()), 0);
-            close(client_socket);
-            continue;
+        int quit_connection = 0;
+        while(quit_connection == 0){    
+            // Get the next message from the client
+            char response2[4096] = "\0";
+            recv(client_socket, response2, sizeof(response2),0);
+
+            if(strcmp(response2, "LIST") == 0){
+
+                // Use system calls to get the number of messages for the user
+                string user_folder = string(file_path) + string("/") + string(input_userName);
+                string s = string("test -d ")+string(user_folder);
+                if(system(check_file_path.c_str()) !=0 ){
+                    string error = string(input_userName) + string(": Folder Read Fail\n");
+                    cout<<error;
+                    send(client_socket, error.c_str(), strlen(error.c_str()), 0);
+                    close(client_socket);
+                    continue;
+                }
+                s = string("touch temp.txt && find ") + string(user_folder) + string(" -type f | wc -l > temp.txt");
+                system(s.c_str());
+                ifstream file;
+                file.open("temp.txt");
+                char num_messages[10];
+                file.getline(num_messages, 10); 
+                file.close();
+                s = "rm -rf temp.txt";
+                system(s.c_str());
+
+                string response_num_msg = string(input_userName) + string(": No. of messages ") + string(num_messages) + string("\n");
+                cout<<response_num_msg;
+                send(client_socket, response_num_msg.c_str(), strlen(response_num_msg.c_str()), 0);
+            }
+            // If the client sends 'quit' message, logout and close connections
+            else if(strcmp(response2, "quit") == 0){
+                quit_connection = 1;
+                string logout_msg = string("Bye ")+string(input_userName)+string("\n");
+                cout<<logout_msg;
+                send(client_socket, logout_msg.c_str(), strlen(logout_msg.c_str()), 0);
+                close(client_socket);
+                continue;
+            }
+            else{
+                string logout_msg = string("Unknown Command\n");
+                cout<<logout_msg;
+                send(client_socket, logout_msg.c_str(), strlen(logout_msg.c_str()), 0);
+                close(client_socket);
+                continue;
+            }
         }
-        else{
-            string logout_msg = string("Unknown Command\n");
-            cout<<logout_msg;
-            send(client_socket, logout_msg.c_str(), strlen(logout_msg.c_str()), 0);
-            close(client_socket);
-            continue;
-        }
-       
-        close(server_socket);
+
+        cout<<"\n";
+        
     }
+    close(server_socket);
 
     file.close();
     return 0;

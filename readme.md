@@ -13,7 +13,7 @@ An application that implements a simplified version of PoP3 email protocol betwe
 ```console
 g++ -std=c++0x -c SimpleEmailServer.cpp
 g++ -std=c++0x -o server SimpleEmailServer.o
-server <port-number> <password-file-name>
+./server <port-number> <password-file-name>
 ```
 
 4. Open another terminal (or another computer) and start the client by typing:
@@ -21,6 +21,6 @@ server <port-number> <password-file-name>
 ```console
 g++ -std=c++0x -c SimpleEmailClient.cpp
 g++ -std=c++0x -o client SimpleClientServer.o
-client <server-IP-Adderss>:<port-number> <username> <password>
+./client <server-IP-Adderss>:<port-number> <username> <password>
 ```
 
