@@ -1,0 +1,5 @@
+SimpleEmailServer.o
+SimpleEmailClient.o
+Server
+Client
+.vscode
